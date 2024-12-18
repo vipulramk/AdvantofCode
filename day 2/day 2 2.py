@@ -1,5 +1,32 @@
-data = """
-1 2 4 7 9 8
+def is_safe(report):
+    """Check if a report is safe according to the original rules."""
+    if all(report[i] < report[i + 1] and 1 <= report[i + 1] - report[i] <= 3 for i in range(len(report) - 1)):
+        return True  # Increasing
+    if all(report[i] > report[i + 1] and 1 <= report[i] - report[i + 1] <= 3 for i in range(len(report) - 1)):
+        return True  # Decreasing
+    return False
+
+
+def count_safe_reports_with_dampener(reports):
+    safe_count = 0
+
+    for report in reports:
+        if is_safe(report):
+            safe_count += 1
+            continue
+
+        # Check if removing a single level makes it safe
+        for i in range(len(report)):
+            modified_report = report[:i] + report[i + 1:]
+            if is_safe(modified_report):
+                safe_count += 1
+                break
+
+    return safe_count
+
+
+# Example usage
+input_data = """1 2 4 7 9 8
 43 44 47 49 49
 6 7 9 11 13 14 18
 34 35 38 39 42 48
@@ -998,57 +1025,8 @@ data = """
 53 54 55 57 60 61
 21 24 27 29 30 33 34 36
 17 20 23 25 26 29 31
-85 86 89 92 94
-"""
-# Parse the data
-rows = data.strip().split("\n")
-parsed_data = list(map(lambda x: list(map(int, x.split())), rows))
+85 86 89 92 94"""
 
-# PART - I
-safe = 0
-
-# Print the parsed data
-for row in parsed_data:
-    # check if all levels are either increasing or decreasing
-    # Check if the row is increasing
-    is_increasing = all(row[i] <= row[i + 1] for i in range(len(row) - 1))
-    # Check if the row is decreasing
-    is_decreasing = all(row[i] >= row[i + 1] for i in range(len(row) - 1))
-    if is_increasing or is_decreasing:
-        if all(1 <= abs(row[i] - row[i + 1]) <= 3 for i in range(len(row) - 1)):
-            safe += 1  # Increment safe count if condition is satisfied
-
-print(safe)
-
-data2 = """
-7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9
-"""
-# Parse the data
-rows2 = data.strip().split("\n")
-parsed_data2 = list(map(lambda x: list(map(int, x.split())), rows2))
-
-safe2 = 0
-
-def is_strictly_increasing(row):
-    return all(row[i] < row[i + 1] for i in range(len(row) - 1))
-
-def is_strictly_decreasing(row):
-    return all(row[i] > row[i + 1] for i in range(len(row) - 1))
-
-for row in parsed_data2:
-    # Check if the row is already strictly increasing or decreasing
-    if is_strictly_increasing(row) or is_strictly_decreasing(row):
-        safe2 += 1
-    else:
-        for i in range(len(row)):
-            new_list = row[:i] + row[i+1:]  # Create a new list with one element removed
-            if is_strictly_increasing(row) or is_strictly_decreasing(row):
-                safe2 += 1
-            break
-
-print(safe2)
+reports = [list(map(int, line.split())) for line in input_data.splitlines()]
+result = count_safe_reports_with_dampener(reports)
+print("Safe reports with Problem Dampener:", result)
